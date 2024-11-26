@@ -13,3 +13,17 @@ export const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ ** Routes
+ */
+
+//* User Route
+import { userRoute } from "./routes/user.route.js";
+app.use("/api/v1/user", userRoute);
