@@ -9,7 +9,6 @@ export const app = express();
  */
 
 //& TODO app.use(cors({}))
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
