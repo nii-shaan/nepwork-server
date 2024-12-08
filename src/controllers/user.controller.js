@@ -91,11 +91,31 @@ export const requestOtp = asyncHandler(async (req, res) => {
         new ApiResponse(406, false, false, "email not provided for otp", null)
       );
   }
-  const otp = await Otp.create({ email, otpCode: 123456 });
 
+  const alreadyCreatedOtp = await Otp.findOne({ email });
+  if (alreadyCreatedOtp) {
+    return res
+      .status(425)
+      .json(
+        new ApiResponse(
+          425,
+          false,
+          true,
+          "previous otp is not expired wait to expire before requesting again",
+          null
+        )
+      );
+  }
+
+  const otp = await Otp.create({
+    email,
+    otpCode: Math.floor(Math.random() * 999999),
+  });
+
+  // * deleting otp after n minutes
   setTimeout(async () => {
-    const deletedOtp = await Otp.findOneAndDelete({ email });
-  }, 60000);
+    await Otp.findOneAndDelete({ email });
+  }, 300000);
 
   return res
     .status(200)
@@ -104,7 +124,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
         199,
         true,
         true,
-        "otp created, will expire after 1 minute",
+        "otp created, will expire after 5 minute",
         otp
       )
     );
