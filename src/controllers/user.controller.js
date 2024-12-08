@@ -1,14 +1,19 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import { Otp } from "../models/otp.model.js";
 
 export const signup = asyncHandler(async (req, res) => {
   const data = req.body;
 
-  const firstName = data.name.firstName.trim();
-  const lastName = data.name.lastName.trim();
-  const email = data.email.trim();
-  const password = data.password.trim();
+  const firstName = data.name.firstName || "";
+  firstName.trim();
+
+  const lastName = data.name.lastName || "";
+  lastName.trim();
+  const email = data.email || "";
+  email.trim();
+  const password = data.password || "";
 
   console.log(data);
 
@@ -28,6 +33,11 @@ export const signup = asyncHandler(async (req, res) => {
     return res
       .status(406)
       .json(new ApiResponse(406, false, false, "password is required", null));
+  }
+  if (password.length < 8) {
+    return res
+      .status(406)
+      .json(new ApiResponse(406, false, false, "password too short", null));
   }
   if (!email) {
     return res
@@ -68,6 +78,41 @@ export const signup = asyncHandler(async (req, res) => {
       .status(500)
       .json(new ApiResponse(500, false, false, "something went wrong", null));
   }
+});
+
+export const requestOtp = asyncHandler(async (req, res) => {
+  const email = req.body.email || "";
+  email.trim();
+
+  if (!email) {
+    return res
+      .status(406)
+      .json(
+        new ApiResponse(406, false, false, "email not provided for otp", null)
+      );
+  }
+  const otp = await Otp.create({ email, otpCode: 123456 });
+
+  setTimeout(async () => {
+    const deletedOtp = await Otp.findOneAndDelete({ email });
+  }, 60000);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        199,
+        true,
+        true,
+        "otp created, will expire after 1 minute",
+        otp
+      )
+    );
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const { otp } = req.body;
 });
 
 export const login = asyncHandler((req, res) => {

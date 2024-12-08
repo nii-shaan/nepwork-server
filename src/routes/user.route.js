@@ -1,9 +1,15 @@
 import { Router } from "express";
-import { signup,login } from "../controllers/user.controller.js";
+import {
+  signup,
+  login,
+  requestOtp,
+  verifyEmail,
+} from "../controllers/user.controller.js";
 
 const userRoute = Router();
 
 userRoute.post("/signup", signup);
-userRoute.get("/login",login)
+userRoute.get("/login", login);
+userRoute.post("/requestOtp",requestOtp);
 
 export { userRoute };
