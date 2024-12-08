@@ -110,6 +110,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
   const otp = await Otp.create({
     email,
     otpCode: Math.floor(Math.random() * 999999),
+    expireAt: new Date(Date.now() + 305 * 1000),
   });
 
   // * deleting otp after n minutes
@@ -131,9 +132,72 @@ export const requestOtp = asyncHandler(async (req, res) => {
 });
 
 export const verifyEmail = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  const { otp } = req.body;
+  const data = req.body;
+  const email = data.email || "";
+  let otpCode = data.otpCode || Number();
+  email.trim();
+
+  otpCode = Number(otpCode);
+
+  if (!email) {
+    return res
+      .status(406)
+      .json(
+        new ApiResponse(
+          406,
+          false,
+          true,
+          "email is required for email verification",
+          null
+        )
+      );
+  }
+
+  const otp = await Otp.findOne({ email });
+
+  if (!otp) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          false,
+          true,
+          "otp has expired or is not request, try again",
+          null
+        )
+      );
+  }
+
+  if (otpCode !== otp.otpCode) {
+    return res
+      .status(406)
+      .json(new ApiResponse(406, false, true, "invalid otp", null));
+  }
+
+  const user = await User.findOneAndUpdate({ email }, { emailVerified: true });
+
+  if (!user) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, false, true, "something went wrong", null));
+  }
+
+  if (user.emailVerified) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, false, true, "email already verified", null));
+  }
+  return res.status(200).json(
+    new ApiResponse(200, true, true, "email verified successfully", {
+      email,
+    })
+  );
 });
+
+
+
+
 
 export const login = asyncHandler((req, res) => {
   res

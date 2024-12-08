@@ -10,6 +10,7 @@ const userRoute = Router();
 
 userRoute.post("/signup", signup);
 userRoute.get("/login", login);
-userRoute.post("/requestOtp",requestOtp);
+userRoute.post("/requestOtp", requestOtp);
+userRoute.post("/verifyEmail", verifyEmail);
 
 export { userRoute };

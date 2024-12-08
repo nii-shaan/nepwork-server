@@ -6,7 +6,17 @@ const otpSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    otpCode: Number,
+
+    otpCode: {
+      required: true,
+      type: Number,
+    },
+
+    expireAt: {
+      type: Date,
+      required: true,
+      expires: 0,
+    },
   },
   { timestamps: true }
 );
