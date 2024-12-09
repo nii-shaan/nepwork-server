@@ -1,16 +1,17 @@
 import { Router } from "express";
+import authenticate from "../middlewares/auth.middleware.js";
 import {
   signup,
   login,
   requestOtp,
   verifyEmail,
-} from "../controllers/user.controller.js";
+} from "../controllers/index.js";
 
 const userRoute = Router();
 
 userRoute.post("/signup", signup);
 userRoute.get("/login", login);
-userRoute.post("/requestOtp", requestOtp);
-userRoute.post("/verifyEmail", verifyEmail);
+userRoute.post("/requestOtp", authenticate, requestOtp);
+userRoute.post("/verifyEmail", authenticate, verifyEmail);
 
 export { userRoute };
