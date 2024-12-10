@@ -9,9 +9,9 @@ export const requestOtp = asyncHandler(async (req, res) => {
 
   if (!email) {
     return res
-      .status(406)
+      .status(400)
       .json(
-        new ApiResponse(406, false, false, "email not provided for otp", null)
+        new ApiResponse(400, false, false, "Email not provided for otp", null)
       );
   }
 
@@ -24,7 +24,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
           425,
           false,
           true,
-          "previous otp is not expired wait to expire before requesting again",
+          "Previous otp is not expired wait to expire before requesting again",
           null
         )
       );
@@ -47,7 +47,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(
-        199,
+        200,
         true,
         true,
         "OTP for Email verification was sent",

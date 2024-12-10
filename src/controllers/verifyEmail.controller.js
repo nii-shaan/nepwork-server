@@ -13,13 +13,13 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
   if (!email) {
     return res
-      .status(406)
+      .status(400)
       .json(
         new ApiResponse(
-          406,
+          400,
           false,
           true,
-          "email is required for email verification",
+          "Email is required for email verification",
           null
         )
       );
@@ -35,7 +35,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
           400,
           false,
           true,
-          "otp has expired or is not request, try again",
+          "OTP expired or has not been requested, try again",
           null
         )
       );
@@ -43,8 +43,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
   if (otpCode !== otp.otpCode) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, true, "invalid otp", null));
+      .status(400)
+      .json(new ApiResponse(400, false, true, "Invalid OTP", null));
   }
 
   const user = await User.findOneAndUpdate({ email }, { emailVerified: true });
@@ -52,16 +52,24 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   if (!user) {
     return res
       .status(500)
-      .json(new ApiResponse(500, false, true, "something went wrong", null));
+      .json(
+        new ApiResponse(
+          500,
+          false,
+          true,
+          "Something went wrong! Try again",
+          null
+        )
+      );
   }
 
   if (user.emailVerified) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, true, "email already verified", null));
+      .json(new ApiResponse(400, false, true, "Email already verified", null));
   }
   return res.status(200).json(
-    new ApiResponse(200, true, true, "email verified successfully", {
+    new ApiResponse(200, true, true, "Email verified successfully", {
       email,
     })
   );

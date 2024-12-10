@@ -19,42 +19,42 @@ export const signup = asyncHandler(async (req, res) => {
 
   if (!firstName) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, false, "first name is required", null));
+      .status(400)
+      .json(new ApiResponse(400, false, false, "First name is required", null));
   }
 
   if (!lastName) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, false, "last name is required", null));
+      .status(400)
+      .json(new ApiResponse(400, false, false, "Last name is required", null));
   }
 
   if (!password) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, false, "password is required", null));
+      .status(400)
+      .json(new ApiResponse(400, false, false, "Password is required", null));
   }
   if (password.length < 8) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, false, "password too short", null));
+      .status(400)
+      .json(new ApiResponse(400, false, false, "Password too short", null));
   }
   if (!email) {
     return res
-      .status(406)
-      .json(new ApiResponse(406, false, false, "email is required", null));
+      .status(400)
+      .json(new ApiResponse(400, false, false, "Email is required", null));
   }
 
   const alreadyExists = await User.findOne({ email });
   if (alreadyExists) {
     return res
-      .status(406)
+      .status(400)
       .json(
         new ApiResponse(
-          406,
+          400,
           false,
           false,
-          "user with this email already exists",
+          "User with this email already exists",
           null
         )
       );
@@ -68,14 +68,14 @@ export const signup = asyncHandler(async (req, res) => {
 
   if (user) {
     // * Successfully created user and sending welcome mail
-    const test = MailService.welcomeMail(
+     MailService.welcomeMail(
       user.email,
       user.name.firstName,
       user.name.lastName
     );
 
     return res.status(201).json(
-      new ApiResponse(201, true, false, "user created", {
+      new ApiResponse(201, true, false, "User created", {
         name: user.name,
         email: user.email,
       })
@@ -83,7 +83,7 @@ export const signup = asyncHandler(async (req, res) => {
   } else {
     return res
       .status(500)
-      .json(new ApiResponse(500, false, false, "something went wrong", null));
+      .json(new ApiResponse(500, false, false, "Something went wrong", null));
   }
 });
 
@@ -97,13 +97,13 @@ export const login = asyncHandler(async (req, res) => {
   if (!email) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "email is required", null));
+      .json(new ApiResponse(400, false, false, "Email is required", null));
   }
 
   if (!password) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "password is required", null));
+      .json(new ApiResponse(400, false, false, "Password is required", null));
   }
 
   const user = await User.findOne({ email });
@@ -111,10 +111,10 @@ export const login = asyncHandler(async (req, res) => {
   if (!user) {
     return res
       .status(404)
-      .json(new ApiResponse(400, false, false, "user not found", null));
+      .json(new ApiResponse(400, false, false, "User not found", null));
   }
 
   res
     .status(200)
-    .json(new ApiResponse(200, true, false, "this is login endpoint", null));
+    .json(new ApiResponse(200, true, false, "This is login endpoint", null));
 });
