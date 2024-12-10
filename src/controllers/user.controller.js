@@ -2,6 +2,36 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { MailService } from "../utils/MailHandler.js";
+import jwt from "jsonwebtoken";
+
+const generateAccessToken = async function (id) {
+  const user = await User.findById(id);
+
+  return jwt.sign(
+    {
+      id: user._id,
+      firstName: user.name.firstName,
+      lastName: user.name.lastName,
+      email: user.email,
+    },
+    process.env.AUTH_ACCESS_TOKEN_SECRET_KEY,
+    { expiresIn: process.env.AUTH_ACCESS_TOKEN_EXPIRY }
+  );
+};
+
+const generateRefreshToken = async function (id) {
+  const user = await User.findById(id);
+  return jwt.sign(
+    {
+      id: user._id,
+      firstName: user.name.firstName,
+      lastName: user.name.lastName,
+      email: user.email,
+    },
+    process.env.AUTH_REFRESH_TOKEN_SECRET_KEY,
+    { expiresIn: process.env.AUTH_REFRESH_TOKEN_EXPIRY }
+  );
+};
 
 export const signup = asyncHandler(async (req, res) => {
   const data = req.body;
@@ -68,7 +98,7 @@ export const signup = asyncHandler(async (req, res) => {
 
   if (user) {
     // * Successfully created user and sending welcome mail
-     MailService.welcomeMail(
+    MailService.welcomeMail(
       user.email,
       user.name.firstName,
       user.name.lastName
@@ -114,7 +144,15 @@ export const login = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, false, false, "User not found", null));
   }
 
-  res
+  if (password !== user.password) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, false, false, "Incorrect Password", null));
+  }
+
+  // TODO: Assign cookies after login
+
+  return res
     .status(200)
-    .json(new ApiResponse(200, true, false, "This is login endpoint", null));
+    .json(new ApiResponse(200, true, true, "Login successful", null));
 });
