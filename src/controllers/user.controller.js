@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import { MailService } from "../utils/MailHandler.js";
 
 export const signup = asyncHandler(async (req, res) => {
   const data = req.body;
@@ -66,6 +67,13 @@ export const signup = asyncHandler(async (req, res) => {
   });
 
   if (user) {
+    // * Successfully created user and sending welcome mail
+    const test = MailService.welcomeMail(
+      user.email,
+      user.name.firstName,
+      user.name.lastName
+    );
+
     return res.status(201).json(
       new ApiResponse(201, true, false, "user created", {
         name: user.name,
@@ -79,10 +87,33 @@ export const signup = asyncHandler(async (req, res) => {
   }
 });
 
+export const login = asyncHandler(async (req, res) => {
+  const data = req.body;
+  const email = data.email || "";
+  email.trim();
+  const password = data.password || "";
+  password.trim();
 
+  if (!email) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, false, false, "email is required", null));
+  }
 
+  if (!password) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, false, false, "password is required", null));
+  }
 
-export const login = asyncHandler((req, res) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(new ApiResponse(400, false, false, "user not found", null));
+  }
+
   res
     .status(200)
     .json(new ApiResponse(200, true, false, "this is login endpoint", null));

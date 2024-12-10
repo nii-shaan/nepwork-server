@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import { Otp } from "../models/otp.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { MailService } from "../utils/MailHandler.js";
 
 export const requestOtp = asyncHandler(async (req, res) => {
   const email = req.body.email || "";
@@ -40,6 +41,8 @@ export const requestOtp = asyncHandler(async (req, res) => {
     await Otp.findOneAndDelete({ email });
   }, 300000);
 
+  const mailed = await MailService.otpMail(email, otp.otpCode);
+
   return res
     .status(200)
     .json(
@@ -47,8 +50,8 @@ export const requestOtp = asyncHandler(async (req, res) => {
         199,
         true,
         true,
-        "otp created, will expire after 5 minute",
-        otp
+        "OTP for Email verification was sent",
+        mailed.response
       )
     );
 });
