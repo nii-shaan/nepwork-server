@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { errorHandler } from "./utils/ApiError.js";
 
 export const app = express();
 
@@ -15,14 +16,22 @@ app.use(cookieParser());
 
 /**
  *
- *
- *
- *
- *
- *
- ** Routes
- */
+*
+*
+*
+*
+*
+** Routes
+*/
 
 //* User Route
 import { userRoute } from "./routes/user.route.js";
 app.use("/api/v1/user", userRoute);
+
+
+
+
+
+
+//* Error handling 
+app.use(errorHandler)

@@ -3,6 +3,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { MailService } from "../utils/MailHandler.js";
 import jwt from "jsonwebtoken";
+import ApiError from "../utils/ApiError.js";
 
 const generateAccessToken = async function (id) {
   const user = await User.findById(id);
@@ -75,6 +76,8 @@ export const signup = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, false, false, "Email is required", null));
   }
 
+  
+
   const alreadyExists = await User.findOne({ email });
   if (alreadyExists) {
     return res
@@ -124,6 +127,7 @@ export const login = asyncHandler(async (req, res) => {
   const password = data.password || "";
   password.trim();
 
+
   if (!email) {
     return res
       .status(400)
@@ -150,9 +154,23 @@ export const login = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, false, false, "Incorrect Password", null));
   }
 
-  // TODO: Assign cookies after login
+  const accessToken = await generateAccessToken(user._id);
+  const refreshToken = await generateRefreshToken(user._id);
+  user.refreshToken = refreshToken;
+  user.save();
 
   return res
+    .cookie("accessToken", accessToken)
+    .cookie("refreshToken", refreshToken)
     .status(200)
-    .json(new ApiResponse(200, true, true, "Login successful", null));
+    .json(
+      new ApiResponse(200, true, true, "Login successful", {
+        name: user.name,
+        email: user.email,
+        tokens: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
+      })
+    );
 });
