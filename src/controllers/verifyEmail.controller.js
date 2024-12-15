@@ -20,6 +20,10 @@ export const verifyEmail = asyncHandler(async (req, res) => {
       );
   }
 
+  if (!otpCode) {
+    return res.status(400).json(new ApiError(400, true, "Please provide OTP"));
+  }
+
   const otp = await Otp.findOne({ email });
 
   if (!otp) {
@@ -55,6 +59,9 @@ export const verifyEmail = asyncHandler(async (req, res) => {
   // * verify email after validations
   user.emailVerified = true;
   await user.save();
+
+  // * delete otp after use
+  await otp.deleteOne();
 
   return res.status(200).json(
     new ApiResponse(200, true, true, "Email verified successfully", {
