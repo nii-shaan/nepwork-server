@@ -3,6 +3,7 @@ import { Otp } from "../models/otp.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { MailService } from "../utils/MailHandler.js";
 import ApiError from "../utils/ApiError.js";
+import { User } from "../models/user.model.js";
 
 export const requestOtp = asyncHandler(async (req, res) => {
   const email = req.body.email || "";
@@ -14,6 +15,20 @@ export const requestOtp = asyncHandler(async (req, res) => {
       .json(new ApiError(400, true, "Email not provided for otp"));
   }
 
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(
+        new ApiError(
+          404,
+          false,
+          "Failed to create OTP, No any user associated with this email"
+        )
+      );
+  }
+
   const alreadyCreatedOtp = await Otp.findOne({ email });
   if (alreadyCreatedOtp) {
     return res
@@ -22,7 +37,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
         new ApiError(
           425,
           true,
-          "Previous OTP has not expired wait to expire before requesting again",
+          "Previous OTP has not expired wait to expire before requesting again"
         )
       );
   }
