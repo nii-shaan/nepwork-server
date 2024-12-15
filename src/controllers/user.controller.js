@@ -51,46 +51,36 @@ export const signup = asyncHandler(async (req, res) => {
   if (!firstName) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "First name is required", null));
+      .json(new ApiError(400, false, "First name is required"));
   }
 
   if (!lastName) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "Last name is required", null));
+      .json(new ApiError(400, false, "Last name is required"));
   }
 
   if (!password) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "Password is required", null));
+      .json(new ApiError(400, false, "Password is required", null));
   }
   if (password.length < 8) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "Password too short", null));
+      .json(new ApiError(400, false, "Password too short", null));
   }
   if (!email) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "Email is required", null));
+      .json(new ApiError(400, false, "Email is required", null));
   }
-
-  
 
   const alreadyExists = await User.findOne({ email });
   if (alreadyExists) {
     return res
       .status(400)
-      .json(
-        new ApiResponse(
-          400,
-          false,
-          false,
-          "User with this email already exists",
-          null
-        )
-      );
+      .json(new ApiError(400, false, "User with this email already exists"));
   }
 
   const user = await User.create({
@@ -116,7 +106,7 @@ export const signup = asyncHandler(async (req, res) => {
   } else {
     return res
       .status(500)
-      .json(new ApiResponse(500, false, false, "Something went wrong", null));
+      .json(new ApiError(500, false, "Something went wrong"));
   }
 });
 
@@ -127,31 +117,24 @@ export const login = asyncHandler(async (req, res) => {
   const password = data.password || "";
   password.trim();
 
-
   if (!email) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, false, false, "Email is required", null));
+    return res.status(400).json(new ApiError(400, false, "Email is required"));
   }
 
   if (!password) {
     return res
       .status(400)
-      .json(new ApiResponse(400, false, false, "Password is required", null));
+      .json(new ApiError(400, false, "Password is required"));
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res
-      .status(404)
-      .json(new ApiResponse(400, false, false, "User not found", null));
+    return res.status(404).json(new ApiError(404, false, "User not found"));
   }
 
   if (password !== user.password) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, false, false, "Incorrect Password", null));
+    return res.status(400).json(new ApiError(400, false, "Incorrect Password"));
   }
 
   const accessToken = await generateAccessToken(user._id);

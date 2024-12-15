@@ -1,10 +1,10 @@
 class ApiError extends Error {
-  constructor(statusCode, message) {
+  constructor(statusCode, isAuthenticated, message) {
     super(message);
 
     this.statusCode = statusCode || 500;
     this.success = false;
-    this.isAuthenticated = false;
+    this.isAuthenticated = isAuthenticated || false;
     this.message = message || "Internal Server Error";
   }
 
@@ -28,7 +28,7 @@ export const errorHandler = (err, req, res, next) => {
       statusCode: 500,
       success: false,
       isAuthenticated: false,
-      message: err.message,
+      message: "SERVER ERROR!!...." + err.message + "....SERVER ERROR!!",
     });
   }
   return next();

@@ -9,10 +9,13 @@ const authenticate = asyncHandler(async (req, res, next) => {
     req.header("Authorization")?.replace("Bearer", "");
 
   if (!accessToken) {
-    return res.status(401).json(new ApiError(400, "Access Token not provided"));
+    return res
+      .status(401)
+      .json(new ApiError(400, false, "Access Token not provided"));
   }
 
   try {
+    // * If token valid goto next middleware
     const jwtVerification = jwt.verify(
       accessToken,
       process.env.AUTH_ACCESS_TOKEN_SECRET_KEY
@@ -23,7 +26,10 @@ const authenticate = asyncHandler(async (req, res, next) => {
 
     next();
   } catch (e) {
-    return res.status(401).json(new ApiError(401, "Invalid Access Token"));
+    // * If invalid token return response
+    return res
+      .status(401)
+      .json(new ApiError(401, false, "Invalid Access Token"));
   }
 });
 
