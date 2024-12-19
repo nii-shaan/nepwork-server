@@ -11,27 +11,24 @@ export const app = express();
 
 //& TODO app.use(cors({}))
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+
 app.use(cookieParser());
 
 /**
  *
-*
-*
-*
-*
-*
-** Routes
-*/
+ *
+ *
+ *
+ *
+ *
+ ** Routes
+ */
 
 //* User Route
 import { userRoute } from "./routes/user.route.js";
 app.use("/api/v1/user", userRoute);
 
-
-
-
-
-
-//* Error handling 
-app.use(errorHandler)
+//* Error handling
+app.use(errorHandler);

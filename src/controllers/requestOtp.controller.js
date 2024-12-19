@@ -24,8 +24,8 @@ export const requestOtp = asyncHandler(async (req, res) => {
         new ApiError(
           404,
           false,
-          "Failed to create OTP, No any user associated with this email"
-        )
+          "Failed to create OTP, No any user associated with this email",
+        ),
       );
   }
 
@@ -37,14 +37,14 @@ export const requestOtp = asyncHandler(async (req, res) => {
         new ApiError(
           425,
           true,
-          "Previous OTP has not expired wait to expire before requesting again"
-        )
+          "Previous OTP has not expired wait to expire before requesting again",
+        ),
       );
   }
 
   const otp = await Otp.create({
     email,
-    otpCode: Math.floor(Math.random() * 999999),
+    otpCode: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
     expireAt: new Date(Date.now() + 305 * 1000),
   });
 
@@ -63,7 +63,7 @@ export const requestOtp = asyncHandler(async (req, res) => {
         true,
         true,
         "OTP for Email verification was sent",
-        mailed.response
-      )
+        mailed.response,
+      ),
     );
 });
