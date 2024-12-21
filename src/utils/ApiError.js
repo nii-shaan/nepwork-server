@@ -5,7 +5,7 @@ class ApiError extends Error {
     this.statusCode = statusCode || 500;
     this.success = false;
     this.isAuthenticated = isAuthenticated || false;
-    this.message = message || "Internal Server Error";
+    this.message = message;
   }
 
   toJSON() {

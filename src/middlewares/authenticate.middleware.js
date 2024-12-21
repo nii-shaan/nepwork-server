@@ -18,7 +18,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
     // * If token valid goto next middleware
     const jwtVerification = jwt.verify(
       accessToken,
-      process.env.AUTH_ACCESS_TOKEN_SECRET_KEY
+      process.env.AUTH_ACCESS_TOKEN_SECRET_KEY,
     );
 
     const user = await User.findById(jwtVerification.id).select("-password");
@@ -27,6 +27,11 @@ const authenticate = asyncHandler(async (req, res, next) => {
     next();
   } catch (e) {
     // * If invalid token return response
+    if (e.message == "jwt expired") {
+      return res
+        .status(400)
+        .json(new ApiError(400, false, "Access Token Expired"));
+    }
     return res
       .status(401)
       .json(new ApiError(401, false, "Invalid Access Token"));
