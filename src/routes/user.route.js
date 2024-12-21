@@ -6,6 +6,7 @@ import {
   refreshAccessToken,
   requestOtp,
   verifyEmail,
+  verifyToken,
   currentUserInfo,
 } from "../controllers/index.js";
 
@@ -16,6 +17,7 @@ userRoute.post("/login", login);
 userRoute.post("/refresh-access-token", refreshAccessToken);
 userRoute.post("/request-otp", authenticate, requestOtp);
 userRoute.post("/verify-email", authenticate, verifyEmail);
+userRoute.get("/verify-token", authenticate, verifyToken);
 userRoute.get("/current-user-info", authenticate, currentUserInfo);
 
 export { userRoute };
