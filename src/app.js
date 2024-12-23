@@ -9,11 +9,14 @@ export const app = express();
  * Basic middlewares
  */
 
-//& TODO app.use(cors({}))
+const corsOption = {
+  credentials: true,
+  origin: process.env.CLIENT_URL,
+};
+
+app.use(cors(corsOption));
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-
 app.use(cookieParser());
 
 /**
